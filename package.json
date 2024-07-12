@@ -10,39 +10,26 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@guardian/prosemirror-invisibles": "^1.2.0",
-    "@pubsweet/ui-toolkit": "^2.3.1",
+    "@emotion/css": "^11.11.2",
     "@tauri-apps/api": ">=2.0.0-beta.0",
+    "@tauri-apps/plugin-dialog": "^2.0.0-beta.6",
+    "@tauri-apps/plugin-fs": "^2.0.0-beta.6",
     "@tauri-apps/plugin-shell": ">=2.0.0-beta.0",
-    "fontsource-merriweather": "^3.0.9",
-    "i18next": "^23.5.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-i18next": "^13.2.2",
-    "react-panelgroup": "^1.0.12",
-    "styled-components": "^5.3.1",
-    "typeface-fira-sans-condensed": "^0.0.54",
-    "typeface-inter": "^1.1.13",
-    "typeface-vollkorn": "^0.0.54",
-    "wax-prosemirror-core": "^0.9.48",
-    "wax-prosemirror-services": "^0.9.48",
-    "wax-questions-service": "^0.9.48",
-    "wax-table-service": "^0.9.48"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
-  "resolutions": {
-    "styled-components": "5.3.1",
-    "prosemirror-model": "1.19.0",
-    "prosemirror-transform": "1.7.1"
+    "ace-code": "^1.35.2",
+    "jodit": "^4.2.27",
+    "jodit-react": "^4.1.2",
+    "js-beautify": "^1.15.1",
+    "murmurhash": "^2.0.1",
+    "pagedjs": "^0.4.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "slate": "^0.103.0",
+    "slate-history": "^0.100.0",
+    "slate-react": "^0.107.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": ">=2.0.0-beta.0",
-    "@vitejs/plugin-react": "^4.2.1",
+    "@vitejs/plugin-react": "^4.3.1",
     "typescript": "^5.2.2",
     "vite": "^5.3.1"
   }

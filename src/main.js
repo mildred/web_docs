@@ -1,13 +1,8 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import Editor from "./editors/WebDocs";
+import ReactDOM from "react-dom/client";
+import App from "./App2";
 
-// React 18
-// import ReactDOM from "react-dom/client";
-// ReactDOM.createRoot(document.getElementById("root")).render(
-//   React.createElement(Editor, {}, null));
+ReactDOM.createRoot(document.getElementById("root")).render(
+  React.createElement(App, {}, null));
 
-ReactDOM.render(
-  React.createElement(Editor, {}, null),
-  document.getElementById("root"));
 

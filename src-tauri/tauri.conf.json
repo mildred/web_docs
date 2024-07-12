@@ -12,13 +12,29 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "web_docs",
+        "title": "WebDocs",
         "width": 800,
         "height": 600
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "main-user-files-write",
+          "windows": [ "main", "window*" ],
+          "permissions": [
+            "app:default",
+            "dialog:default",
+            "event:default",
+            "webview:allow-create-webview-window",
+            "window:allow-destroy",
+            "window:allow-set-title",
+            "fs:default",
+            "fs:allow-app-write"
+          ]
+        }
+      ]
     }
   },
   "bundle": {
@@ -31,5 +47,7 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
   }
 }
