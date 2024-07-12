@@ -119,26 +119,28 @@ const App = ({}) => {
             margin-top: 10mm;
             margin-bottom: 25mm;
 
+            @bottom-center {
+              content: string(title);
+              text-transform: uppercase;
+            }
+	  }
+
           @page:left {
             margin-right: 20mm;
             margin-left: 15mm;
+
+            @bottom-left {
+              content: counter(page);
+            }
           }
 
           @page:right {
             margin-right: 15mm;
             margin-left: 20mm;
-          }
 
-          @page {
-            @bottom-left {
+            @bottom-right {
               content: counter(page);
             }
-
-            @bottom-center {
-              content: string(title);
-              text-transform: uppercase;
-            }
-
           }
 
           h1 {
