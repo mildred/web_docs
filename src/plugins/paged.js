@@ -32,8 +32,17 @@ const previewPage = {
 function debounce(delay, func) {
   let timer = null
   return (...args) => {
-    if (timer !== null) clearTimeout(timer)
-    timer = setTimeout(() => func(...args), delay)
+    // Cancel previous calls that are still in the timeout phase
+    if (timer !== null) {
+      clearTimeout(timer)
+      timer = null
+    }
+
+    timer = setTimeout(() => {
+      // run the actual function after the delay
+      timer = null
+      func(...args)
+    }, delay)
   }
 }
 
@@ -47,9 +56,11 @@ class Paged {
     this.css.textContent = css
     editor.ow.document.head.insertBefore(this.css, null)
 
-    editor.events.on('change', debounce_heavy(100, e => {
+    this.triggerRender = debounce(500, () => {
       if (this.preview) this.renderPreview(editor)
-    }));
+    })
+
+    editor.events.on('change', this.triggerRender);
 
     editor.events.on('postProcessSetEditorValue', e => {
       const iframe = editor.container.querySelector('.jodit-wysiwyg_iframe')
@@ -76,13 +87,15 @@ class Paged {
       workplace.insertBefore(div, null)
       this.preview_container = div
       this.preview = true
-      this.renderPreview(editor)
+      this.triggerRender(editor)
     }
   }
 
   renderPreview(editor){
     const iframe = editor.container.querySelector('.jodit-wysiwyg_iframe')
     const dom_content = iframe.contentDocument.body // not documentElement
+    this.preview_container.contentDocument.documentElement.classList.toggle('paged-preview-single-sided', true)
+    this.preview_container.contentDocument.body.innerHTML = ''
     this.preview_container.contentDocument.head.innerHTML = iframe.contentDocument.head.innerHTML + `
       <link rel="stylesheet" href="/src/paged_interface.css" media="screen" />
     `

@@ -20,7 +20,7 @@
     "jodit-react": "^4.1.2",
     "js-beautify": "^1.15.1",
     "murmurhash": "^2.0.1",
-    "pagedjs": "^0.4.3",
+    "pagedjs": "git://github.com/mildred/pagedjs.git#main",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "slate": "^0.103.0",
