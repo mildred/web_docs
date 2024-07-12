@@ -1,7 +1,15 @@
-# Tauri + Vanilla TS
+# WebDocs - HTML based word processor
 
-This template should help get you started developing with Tauri in vanilla HTML, CSS and Typescript.
+This project came with the disatisfaction of open source word processors for
+edition.
 
-## Recommended IDE Setup
+Hopefully, the HTML + JavaScript stack would allow more configurable cross
+references table of contents and indexes while CSS allors for pretty good
+styling.
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+It uses [PagedJS](https://pagedjs.org) for the page layouts and
+[Tauri](https://tauri.app/) for development.
+
+## Development
+
+    npm run tauri dev
