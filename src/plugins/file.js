@@ -1,5 +1,5 @@
 import { event } from '@tauri-apps/api'
-import { getCurrent, getAll, CloseRequestedEvent } from "@tauri-apps/api/window";
+import { getCurrentWindow, getAllWindows, CloseRequestedEvent } from "@tauri-apps/api/window";
 import { WebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { ask, open, save, message } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
@@ -9,7 +9,7 @@ function uniqueWindowLabel(prefix = 'window') {
   for(let i = 0;;i++) {
     let label = `${prefix}${i}`
     let found = false
-    for(let win of getAll()) {
+    for(let win of getAllWindows()) {
       if (win.label == label) {
         found = true
         break
@@ -94,7 +94,7 @@ class File {
   ]
 
   init(editor) {
-    const win = getCurrent()
+    const win = getCurrentWindow()
     this.unlisten = win.listen("tauri://close-requested", async (e) => {
       const ev = new CloseRequestedEvent(event)
       if (this.isDirty(editor)) {
@@ -251,7 +251,7 @@ class File {
 
   setCurrentPath(path) {
     this.currentPath = path
-    getCurrent().setTitle(`${path.match(/[^\/]*$/)[0]} - WebDocs - ${path.match(/^(.*)\/[^\/]*$/)[1]}`)
+    getCurrentWindow().setTitle(`${path.match(/[^\/]*$/)[0]} - WebDocs - ${path.match(/^(.*)\/[^\/]*$/)[1]}`)
   }
 }
 

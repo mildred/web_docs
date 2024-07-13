@@ -28,6 +28,7 @@
             "dialog:default",
             "event:default",
             "webview:allow-create-webview-window",
+            "webview:allow-print",
             "window:allow-destroy",
             "window:allow-set-title",
             "fs:default",
@@ -46,6 +47,8 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "externalBin": [
     ]
   },
   "plugins": {

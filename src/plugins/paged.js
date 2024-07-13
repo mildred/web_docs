@@ -1,4 +1,5 @@
 import { Previewer } from 'pagedjs';
+import { getCurrentWebview } from "@tauri-apps/api/webview";
 
 const css = `
   .jodit-container:not(.jodit_inline) .jodit-workplace.jodit-workplace__paged-preview {
@@ -27,6 +28,16 @@ const previewPage = {
     const { paged } = editor.__plugins
     return paged.preview
   }
+}
+
+const printPage = {
+  icon: 'print',
+  tooltip: "Print",
+
+  async exec(editor) {
+    const { paged } = editor.__plugins
+    paged.printPage(editor)
+  },
 }
 
 function debounce(delay, func) {
@@ -105,10 +116,20 @@ class Paged {
     const styles = paged.removeStyles(this.preview_container.contentDocument)
     paged.preview(dom_content, styles, this.preview_container.contentDocument.body)
   }
+
+  printPage(editor) {
+    getCurrentWebview().print([
+      { Silent: true },
+      { GeneratePDF: {
+        filename: "/home/mildred/webdocs.pdf"
+      } },
+    ])
+  }
 }
 
 export default function(Jodit) {
   Jodit.defaultOptions.controls.previewPage = previewPage
+  Jodit.defaultOptions.controls.printPage   = printPage
 
   Jodit.plugins.add('paged', Paged);
 }

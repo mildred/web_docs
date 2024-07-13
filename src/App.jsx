@@ -53,7 +53,7 @@ const App = ({}) => {
   ].filter(x => x))
   */
   const buttons = (small, xsmall) => ([
-    {group: "file",       buttons: [ 'newFile', 'openFile', 'saveFile' ]},
+    {group: "file",       buttons: [ 'newFile', 'openFile', 'saveFile', 'printPage' ]},
     {group: "history",    buttons: []},
     {group: "clipboard2", buttons: ["cut", "copy", "paste"]}, // {group: "clipboard", buttons: []},
     "|",
@@ -110,6 +110,10 @@ const App = ({}) => {
           margin-top: 0;
           margin-bottom: 6px;
           line-height: 1.4;
+        }
+
+        :root {
+          print-color-adjust: exact;
         }
 
         @media print {
