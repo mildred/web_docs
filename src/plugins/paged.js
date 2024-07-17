@@ -1,6 +1,6 @@
 import { Previewer } from 'pagedjs';
 import { Command } from "@tauri-apps/plugin-shell";
-import { path } from '@tauri-apps/api'
+import { resolveResource } from '@tauri-apps/api/path'
 
 const css = `
   .jodit-container:not(.jodit_inline) .jodit-workplace.jodit-workplace__paged-preview {
@@ -131,8 +131,8 @@ class Paged {
 
   async printPage(editor) {
     // return this.printPageTauri(editor)
-    let bin_dir = await path.resolveResource('./bin')
-    let pagedjs_dir = await path.resolveResource('../node_modules/pagedjs-cli')
+    let bin_dir = await resolveResource('./bin')
+    let pagedjs_dir = await resolveResource('../node_modules/pagedjs-cli')
     console.log(bin_dir, pagedjs_dir)
     let command = Command.sidecar('./bin/node', [pagedjs_dir + '/pagedjs.js', "--help"])
     const output = await command.execute()
