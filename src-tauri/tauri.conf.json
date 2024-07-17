@@ -27,12 +27,22 @@
             "app:default",
             "dialog:default",
             "event:default",
+            "fs:default",
+            "fs:allow-app-write",
+            "path:default",
+            { "identifier": "shell:allow-execute",
+              "allow": [
+                {
+                  "name":    "./bin/node",
+                  "sidecar": true,
+                  "args":    true
+                }
+              ]
+            },
             "webview:allow-create-webview-window",
             "webview:allow-print",
             "window:allow-destroy",
-            "window:allow-set-title",
-            "fs:default",
-            "fs:allow-app-write"
+            "window:allow-set-title"
           ]
         }
       ]
@@ -49,8 +59,15 @@
       "icons/icon.ico"
     ],
     "externalBin": [
+      "./bin/node"
+    ],
+    "resources": [
+      "./bin",
+      "../node_modules/pagedjs-cli"
     ]
   },
   "plugins": {
+    "shell": {
+    }
   }
 }

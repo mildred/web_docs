@@ -1,5 +1,7 @@
 import { Previewer } from 'pagedjs';
 import { getCurrentWebview } from "@tauri-apps/api/webview";
+import { Command } from "@tauri-apps/plugin-shell";
+import { resolveResource } from '@tauri-apps/api/path'
 
 const css = `
   .jodit-container:not(.jodit_inline) .jodit-workplace.jodit-workplace__paged-preview {
@@ -117,13 +119,24 @@ class Paged {
     paged.preview(dom_content, styles, this.preview_container.contentDocument.body)
   }
 
-  printPage(editor) {
+  printPageTauri(editor) {
     getCurrentWebview().print([
-      { Silent: true },
+      //{ Silent: true },
       { GeneratePDF: {
-        filename: "/home/mildred/webdocs.pdf"
+        filename: "/tmp/webdocs.pdf"
       } },
     ])
+  }
+
+  async printPage(editor) {
+    // return this.printPageTauri(editor)
+    let bin_dir = await resolveResource('./bin')
+    let pagedjs_dir = await resolveResource('../node_modules/pagedjs-cli')
+    console.log(bin_dir, pagedjs_dir)
+    let command = Command.sidecar('./bin/node', [pagedjs_dir + '/pagedjs.js', "--help"])
+    const output = await command.execute()
+    console.log(output)
+    alert(output.stdout + output.stderr)
   }
 }
 

@@ -5,9 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && npm run prepare_pagedjs && npm run copy_node",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "copy_node": "node copy_node.js",
+    "prepare_pagedjs": "cd node_modules/pagedjs-cli && cp ../../pagedjs-cli/* . && npm ci",
+    "_pkg_pagedjs": "(cd node_modules/pagedjs-cli; npm i); cd node_modules/pagedjs-cli; ../.bin/pkg -o pagedjs-cli src/cli.js",
+    "_pkg_fetch_pagedjs": "(cd node_modules/pagedjs-cli; npm i); cd node_modules/pagedjs-cli; ../.bin/pkg-fetch -o dist src/cli.js",
+    "_nexe": "(cd node_modules/pagedjs-cli; npm i); node ./nexe.cjs"
   },
   "dependencies": {
     "@emotion/css": "^11.11.2",
@@ -21,7 +26,6 @@
     "js-beautify": "^1.15.1",
     "murmurhash": "^2.0.1",
     "pagedjs": "git://github.com/mildred/pagedjs.git#main",
-    "pagedjs-cli": "^0.4.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "slate": "^0.103.0",
@@ -31,6 +35,11 @@
   "devDependencies": {
     "@tauri-apps/cli": ">=2.0.0-beta.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "@yao-pkg/pkg": "^5.12.0",
+    "@yao-pkg/pkg-fetch": "^3.5.9",
+    "nexe": "^4.0.0-rc.6",
+    "node-packer": "^0.1.7",
+    "pagedjs-cli": "^0.4.3",
     "typescript": "^5.2.2",
     "vite": "^5.3.1"
   }
