@@ -29,6 +29,7 @@
             "event:default",
             "fs:default",
             "fs:allow-app-write",
+            "fs:allow-temp-write",
             "path:default",
             { "identifier": "shell:allow-execute",
               "allow": [
@@ -39,6 +40,8 @@
                 }
               ]
             },
+            "shell:default",
+            "shell:allow-open",
             "webview:allow-create-webview-window",
             "webview:allow-print",
             "window:allow-destroy",
