@@ -33,6 +33,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
+      - name: install nodejs (macos x86_64-apple-darwin)
+        if: matrix.args == '--target x86_64-apple-darwin'
+        run: |
+          set -e
+          wget https://nodejs.org/dist/v20.15.1/node-v20.15.1-darwin-x64.tar.gz
+          tar vxf node-v20.15.1-darwin-x64.tar.gz
+          mv node-v20.15.1-darwin-x64/bin/node src-tauri/bin/node-x86_64-apple-darwin
+
       - name: setup node
         uses: actions/setup-node@v4
         with:
