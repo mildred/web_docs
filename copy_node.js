@@ -15,7 +15,7 @@ let triple = execSync('rustc --version --verbose')
   })
   .find(x => x)
 
-let ext = process.platform == 'windows' ? '.exe' : ''
+let ext = process.execPath.endsWith('.exe') ? '.exe' : ''
 let dest = `src-tauri/bin/node-${triple}${ext}`
 console.log("Copy %s to %s [%o]", process.execPath, dest, {platform: process.platform, arch: process.arch})
 copyFileSync(process.execPath, dest)
