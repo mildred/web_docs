@@ -1,4 +1,5 @@
-# WebDocs - HTML based word processor
+WebDocs - HTML based word processor
+===================================
 
 This project came with the disatisfaction of open source word processors for
 edition.
@@ -10,6 +11,18 @@ styling.
 It uses [PagedJS](https://pagedjs.org) for the page layouts and
 [Tauri](https://tauri.app/) for development.
 
-## Development
+Development
+-----------
+
+Getting started:
 
     npm run tauri dev
+
+Change version:
+
+  - update version number in `src-tauri/tauri.conf.json` (most important)
+  - update version number in `package.json` (less important)
+  - commit: `git commit -am "$(jq '"v"+.version' src-tauri/tauri.conf.json)"`
+  - tag: `git tag -am "$(jq '"v"+.version' src-tauri/tauri.conf.json)" "$(jq '"v"+.version' src-tauri/tauri.conf.json)"`
+  - push: `git push origin --tags HEAD`
+
