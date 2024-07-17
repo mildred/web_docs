@@ -1,6 +1,6 @@
 {
-  "productName": "web_docs",
-  "version": "0.1.1",
+  "productName": "WebDocs",
+  "version": "0.1.2",
   "identifier": "web-docs.mildred.fr",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -52,6 +52,8 @@
     }
   },
   "bundle": {
+    "shortDescription": "Web Word Processor",
+    "longDescription": "Word Processor that makes use of Web technologies to be highly flexible",
     "active": true,
     "targets": "all",
     "createUpdaterArtifacts": true,
