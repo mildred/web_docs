@@ -1,5 +1,4 @@
 import { Previewer } from 'pagedjs';
-import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { Command } from "@tauri-apps/plugin-shell";
 import { resolveResource } from '@tauri-apps/api/path'
 
@@ -119,6 +118,7 @@ class Paged {
     paged.preview(dom_content, styles, this.preview_container.contentDocument.body)
   }
 
+  /*
   printPageTauri(editor) {
     getCurrentWebview().print([
       //{ Silent: true },
@@ -127,6 +127,7 @@ class Paged {
       } },
     ])
   }
+  */
 
   async printPage(editor) {
     // return this.printPageTauri(editor)
