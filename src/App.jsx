@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import JoditEditor, { Jodit } from './JoditEditor';
+import { getVersion } from '@tauri-apps/api/app';
 
 import ace from 'ace-code/src/ace'
 window.ace = ace
@@ -14,6 +15,9 @@ console.log(JSON.stringify(Jodit.defaultOptions.buttonsXS))
 const App = ({}) => {
   const editor = useRef(null);
   const [content, setContent] = useState('');
+  const [version, seteVersion] = useState('')
+
+  getVersion().then(seteVersion)
 
   useEffect(() => {
     return () => {
@@ -175,16 +179,34 @@ const App = ({}) => {
   );
 
   return (
-    <JoditEditor
-      ref={editor}
-      value={content}
-      config={config}
-      // tabIndex of textarea
-      tabIndex={1}
-      // preferred to use only this option to update the content for performance reasons
-      onBlur={(newContent) => setContent(newContent)}
-      onChange={(newContent) => {}}
-    />
+    <>
+      <style>
+        {`
+        .jodit-status-bar > .jodit-status-bar__item:last-child {
+          display: none;
+        }
+        .jodit-status-bar::after {
+          margin: 0 0 0 8px;
+          content: "WebDocs v${version}";
+          order: 3;
+          font-size: 11px;
+          line-height: 1.5714em;
+          color: rgba(0, 0, 0, 0.75);
+          font-family: -apple-system,blinkmacsystemfont,"Segoe UI",roboto,oxygen-sans,ubuntu,cantarell,"Helvetica Neue",sans-serif;
+        }
+        `}
+      </style>
+      <JoditEditor
+        ref={editor}
+        value={content}
+        config={config}
+        // tabIndex of textarea
+        tabIndex={1}
+        // preferred to use only this option to update the content for performance reasons
+        onBlur={(newContent) => setContent(newContent)}
+        onChange={(newContent) => {}}
+      />
+    </>
   );
 };
 
