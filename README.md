@@ -25,4 +25,5 @@ Change version:
   - commit: `git commit -am "$(jq '"v"+.version' src-tauri/tauri.conf.json)"`
   - tag: `git tag -am "$(jq '"v"+.version' src-tauri/tauri.conf.json)" "$(jq '"v"+.version' src-tauri/tauri.conf.json)"`
   - push: `git push origin --tags HEAD`
+  - update version number to add `.dev`
 
