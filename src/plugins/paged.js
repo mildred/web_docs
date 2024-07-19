@@ -1,6 +1,6 @@
 import { Previewer } from 'pagedjs';
 import { Command, open } from "@tauri-apps/plugin-shell";
-import { resolveResource, tempDir } from '@tauri-apps/api/path'
+import { resolveResource, tempDir, join } from '@tauri-apps/api/path'
 import { writeTextFile } from '@tauri-apps/plugin-fs';
 
 const css = `
@@ -136,22 +136,26 @@ class Paged {
     let pagedjs_dir = await resolveResource('../node_modules/pagedjs-cli')
     let tmp = await tempDir()
     let rand = crypto.randomUUID()
-    let html_path = `${tmp}/${rand}.html`
-    let pdf_path = `${tmp}/${rand}.pdf`
+    let html_path = await join(tmp, `${rand}.html`)
+    let pdf_path = await join(tmp, `${rand}.pdf`)
 
     writeTextFile(html_path, editor.value)
 
-    let command = Command.sidecar('./bin/node', [pagedjs_dir + '/src/cli.js', "-i", html_path, "-o", pdf_path], {
+    let command = Command.sidecar('./bin/node', [await join(pagedjs_dir, 'src', 'cli.js'), "-i", html_path, "-o", pdf_path], {
       env: {
         // https://github.com/hardkoded/puppeteer-sharp/issues/2633
-        XDG_CONFIG_HOME: `${tmp}/${rand}.chromium-config`,
-        XDG_CACHE_HOME:  `${tmp}/${rand}.chromium-cache`
+        XDG_CONFIG_HOME: await join(tmp, `${rand}.chromium-config`),
+        XDG_CACHE_HOME:  await join(tmp, `${rand}.chromium-cache`)
       }
     })
-    const output = await command.execute()
-    console.log("Generated PDF (%o):\n%s", output, output.stdout + output.stderr)
+    try {
+      const output = await command.execute()
+      console.log("Generated PDF (%o):\n%s", output, output.stdout + output.stderr)
 
-    open(pdf_path)
+      open(pdf_path)
+    } catch (e) {
+      alert(e)
+    }
   }
 }
 
