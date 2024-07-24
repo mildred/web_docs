@@ -105,7 +105,7 @@ class Paged {
       const style = iframe.contentDocument.createElement('link')
       style.setAttribute('rel', 'stylesheet')
       style.setAttribute('media', 'screen')
-      style.setAttribute('href', '/src/paged_interface.css')
+      style.setAttribute('href', '/paged_interface.css')
 
       iframe.contentDocument.head.insertBefore(style, iframe.contentDocument.head.firstChild)
 
@@ -145,7 +145,7 @@ class Paged {
     this.preview_container.contentDocument.documentElement.classList.toggle('paged-preview-single-sided', true)
     this.preview_container.contentDocument.body.innerHTML = ''
     this.preview_container.contentDocument.head.innerHTML = iframe.contentDocument.head.innerHTML + `
-      <link rel="stylesheet" href="/src/paged_interface.css" media="screen" />
+      <link rel="stylesheet" href="/paged_interface.css" media="screen" />
     `
     // Cannot reuse the previewer
     // https://gitlab.coko.foundation/pagedjs/pagedjs/-/issues/457
