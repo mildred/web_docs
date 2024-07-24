@@ -69,11 +69,8 @@
       "icons/icon.ico"
     ],
     "externalBin": [
-      "./bin/node"
     ],
     "resources": [
-      "./bin",
-      "../node_modules/pagedjs-cli"
     ]
   },
   "plugins": {
