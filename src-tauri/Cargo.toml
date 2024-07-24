@@ -18,11 +18,16 @@ serde_json = "1"
 tauri-plugin-dialog = "^2.0.0-beta.11"
 tauri-plugin-fs = "^2.0.0-beta.10"
 tauri-plugin-process = "2.0.0-beta.8"
+serialize-to-javascript = "=0.1.1"
+tauri-plugin-web-server = { path = "../web_server" }
 
 [target."cfg(not(any(target_os = \"android\", target_os = \"ios\")))".dependencies]
+tauri-plugin-cli = "2.0.0-beta.8"
 tauri-plugin-updater = "2.0.0-beta.10"
 
-# [patch.crates-io]
+[patch.crates-io]
 # tauri = { path = "../../tauri/core/tauri" }
 # wry   = { path = "../../wry" }
+# in package.json: "@tauri-apps/api": "../tauri/tooling/api/dist",
+
 

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import JoditEditor, { Jodit } from './JoditEditor';
 import { getVersion } from '@tauri-apps/api/app';
+import { getMatches } from '@tauri-apps/plugin-cli'
+import { readTextFile } from '@tauri-apps/plugin-fs';
 
 import ace from 'ace-code/src/ace'
 window.ace = ace
@@ -15,9 +17,9 @@ console.log(JSON.stringify(Jodit.defaultOptions.buttonsXS))
 const App = ({}) => {
   const editor = useRef(null);
   const [content, setContent] = useState('');
-  const [version, seteVersion] = useState('')
+  const [version, setVersion] = useState('')
 
-  getVersion().then(seteVersion)
+  getVersion().then(setVersion)
 
   useEffect(() => {
     return () => {
@@ -25,37 +27,15 @@ const App = ({}) => {
     }
   }, [])
 
-  /*
-  const buttons = (small, xsmall) => ([
-    {group: "file",       buttons: ['newFile', 'openFile', 'saveFile']},
-    {group: "history",    buttons: []},
-    // {group: "clipboard", buttons: []},
-    {group: "clipboard2", buttons: ["cut", "copy", "paste"]}, // copyformat
-    {group: "copyformat", buttons: ["copyformat"]},
-    "---",
-    //{group: "insert",     buttons: []},
-    {group: "insert2",    buttons: ["table", "hr", "symbols", "link"]},
-    "---",
-    {group: "search",     buttons: []},
-    {group: "state",      buttons: []},
-    {group: "source",     buttons: []},
-    //{group: "other",      buttons: []},
-    //{group: "info",       buttons: []}
-    "\n",
-    //{group: "font",       buttons: []},
-    {group: "font2",      buttons: ["font", "fontsize", "paragraph"]},
-    //{group: "form",       buttons: []},
-    {group: "font-style", buttons: []},
-    {group: "script2",    buttons: ["subscript", "superscript"]},
-    //{group: "script",     buttons: []},
-    {group: "color",      buttons: []},
-    {group: "indent",     buttons: []},
-    {group: "list",       buttons: []},
-    //{group: "media",      buttons: []},
-    "---",
-    (small ? "dots" : null)
-  ].filter(x => x))
-  */
+  getMatches().then(async (matches) => {
+    if (matches.filename) {
+      const html = await readTextFile(path)
+      if (html != null) {
+        setContent(html)
+      }
+    }
+  })
+
   const buttons = (small, xsmall) => ([
     {group: "file",       buttons: [ 'newFile', 'openFile', 'saveFile', 'printPage' ]},
     {group: "history",    buttons: []},
