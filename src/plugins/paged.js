@@ -3,6 +3,7 @@ import { Command, open } from "@tauri-apps/plugin-shell";
 import { resolveResource, tempDir, join } from '@tauri-apps/api/path'
 import { writeTextFile } from '@tauri-apps/plugin-fs';
 import { getCurrentWebview } from '@tauri-apps/api/webview'
+import { serve, closeServer, respondServer } from '../../web_server/guest-js/index'
 
 const css = `
   .jodit-container:not(.jodit_inline) .jodit-workplace.jodit-workplace__paged-preview {
@@ -80,10 +81,43 @@ class Paged {
       const iframe = editor.container.querySelector('.jodit-wysiwyg_iframe')
       iframe.contentDocument.documentElement.classList.toggle('jodit-wysiwyg_iframe', true)
     })
+
+    serve({
+      serveAssets: true,
+      handler: this.httpHandler.bind(this, editor)
+    }).then(addr => {
+      console.log("server at %o", addr)
+      this.server = addr
+    })
   }
 
   destruct() {
+    if(this.server) closeServer(this.server)
     this.css?.remove()
+  }
+
+  httpHandler(editor, [id, req, res]){
+    console.log("[%o] http handler", id, req, res)
+    if (req.path == "/") {
+      const iframe = editor.container.querySelector('.jodit-wysiwyg_iframe')
+      const dom_content = iframe.contentDocument.documentElement
+
+      const style = iframe.contentDocument.createElement('link')
+      style.setAttribute('rel', 'stylesheet')
+      style.setAttribute('media', 'screen')
+      style.setAttribute('href', '/src/paged_interface.css')
+
+      iframe.contentDocument.head.insertBefore(style, iframe.contentDocument.head.firstChild)
+
+      res.body_data = null
+      res.body_text = editor.value
+      res.headers['Content-Type'] = 'text/html; charset=utf-8'
+
+      style.remove()
+    }
+    respondServer(id, res)
+    console.log("[%o] http handler responded", id, res)
+    return res
   }
 
   togglePreview(editor) {
@@ -129,8 +163,13 @@ class Paged {
     ])
   }
 
+  async printPageHttpServer(editor) {
+    open(`http://${this.server}`)
+  }
+
   async printPage(editor) {
-    return this.printPageTauri(editor)
+    return await this.printPageHttpServer(editor)
+    //return this.printPageTauri(editor)
 
     let bin_dir = await resolveResource('./bin')
     let pagedjs_dir = await resolveResource('../node_modules/pagedjs-cli')

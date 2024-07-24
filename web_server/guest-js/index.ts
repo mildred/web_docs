@@ -1,9 +1,46 @@
-import { invoke } from '@tauri-apps/api/core'
+import { invoke, transformCallback } from '@tauri-apps/api/core'
 
-export async function ping(value: string): Promise<string | null> {
-  return await invoke<{value?: string}>('plugin:web-server|ping', {
+type ServerRequest = {
+  path: string
+  url: string
+}
+
+type ServerResponse = {
+  headers: {
+    [name: string]: string
+  },
+  body_data: [number] | object,
+  body_text: string,
+}
+
+type ServerOptions = {
+  serveAssets: boolean,
+  handler: string | (string, ServerRequest, ServerResponse) => ServerResponse,
+}
+
+type ServerInstance = {
+  address: string
+}
+
+export async function serve(options: ServerOptions): Promise<null | ServerInstance> {
+  if (typeof(options.handler) == 'function') options.handler = transformCallback(options.handler).toString()
+
+  return await invoke<{value?: ServerInstance}>('plugin:web-server|serve', {
+    payload: options,
+  }).then((r) => (r.address ? r.address : null));
+}
+
+export async function closeServer(address: string): Promise<null | ServerInstance> {
+  return await invoke<{value?: ServerInstance}>('plugin:web-server|close', {
+    address: address,
+  })
+}
+
+export async function respondServer(address: string, response: ServerResponse): Promise<null | ServerInstance> {
+  return await invoke<{value?: ServerInstance}>('plugin:web-server|respond', {
     payload: {
-      value,
-    },
-  }).then((r) => (r.value ? r.value : null));
+      id: address,
+      response: response,
+    }
+  })
 }

@@ -3993,6 +3993,7 @@ version = "0.0.0"
 dependencies = [
  "http",
  "serde",
+ "serde_json",
  "tauri",
  "tauri-plugin",
  "thiserror",

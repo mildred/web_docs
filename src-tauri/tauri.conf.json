@@ -25,6 +25,8 @@
           "windows": [ "main", "window*" ],
           "permissions": [
             "app:default",
+            "cli:allow-cli-matches",
+            "cli:default",
             "dialog:default",
             "event:default",
             "fs:default",
@@ -40,8 +42,10 @@
                 }
               ]
             },
+            "updater:allow-check",
             "shell:default",
             "shell:allow-open",
+            "web-server:allow-serve",
             "webview:allow-create-webview-window",
             "webview:allow-print",
             "window:allow-destroy",

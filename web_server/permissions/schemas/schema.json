@@ -314,6 +314,20 @@
           "enum": [
             "default"
           ]
+        },
+        {
+          "description": "allow-serve -> Enables the serve command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "allow-serve"
+          ]
+        },
+        {
+          "description": "deny-serve -> Denies the serve command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "deny-serve"
+          ]
         }
       ]
     }

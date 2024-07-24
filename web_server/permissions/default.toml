@@ -1,3 +1,13 @@
+[[permission]]
+identifier = "allow-serve"
+description = "Enables the serve command without any pre-configured scope."
+commands.allow = ["serve", "respond", "close"]
+
+[[permission]]
+identifier = "deny-serve"
+description = "Denies the serve command without any pre-configured scope."
+commands.deny = ["serve", "respond", "close"]
+
 [default]
 description = "Default permissions for the plugin"
-permissions = ["allow-ping"]
+permissions = ["allow-serve"]

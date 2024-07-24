@@ -38,7 +38,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
   Builder::new("web-server")
     .invoke_handler(tauri::generate_handler![
       commands::serve,
-      commands::close
+      commands::close,
+      commands::respond,
     ])
     .setup(|app, api| {
       #[cfg(mobile)]

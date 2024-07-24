@@ -2,7 +2,7 @@
 
 Default permissions for the plugin
 
-- `allow-ping`
+- `allow-serve`
 
 ### Permission Table 
 
@@ -35,6 +35,32 @@ Enables the ping command without any pre-configured scope.
 <td>
 
 Denies the ping command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`web-server:allow-serve`
+
+</td>
+<td>
+
+Enables the serve command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`web-server:deny-serve`
+
+</td>
+<td>
+
+Denies the serve command without any pre-configured scope.
 
 </td>
 </tr>

@@ -1,7 +1,7 @@
 use serde::de::DeserializeOwned;
 use tauri::{plugin::PluginApi, AppHandle, Runtime};
 use std::vec::Vec;
-use std::sync::{Mutex, Arc};
+use std::sync::{Mutex, Arc, Condvar};
 
 use crate::models::*;
 
@@ -23,11 +23,25 @@ pub struct WebServerPlugin<R: Runtime> {
 }
 
 impl<R: Runtime> WebServerPlugin<R> {
-  pub fn serve(&self, options: ServerOptions) -> crate::Result<ServeResponse> {
-    let server = WebServer::new(&self.app, options).unwrap();
+  pub fn serve(&mut self, win: &tauri::Webview<R>, options: ServerOptions) -> crate::Result<ServeResponse> {
+    let server = WebServer::new(&self.app, win, options).unwrap();
+    let id = server.id.clone();
+    self.servers.push(server);
     Ok(ServeResponse {
-      address: WebServer::address(&server)?,
+      address: id,
     })
+  }
+
+  pub fn respond_server<'s>(self: &'s mut Self, id: &str, res: Response) -> crate::Result<()> {
+    for srv in self.servers.iter() {
+      println!("iterate server {} ({})", srv.id, id);
+      if srv.id != id { continue; }
+
+      srv.respond(res)?;
+    
+      return Ok(())
+    }
+    Err(crate::Error::NoServer(id.to_string()))
   }
 
   pub fn close_server<'s>(self: &'s mut Self, id: &str) -> crate::Result<()> {
@@ -44,73 +58,111 @@ impl<R: Runtime> WebServerPlugin<R> {
   }
 }
 
-use std::collections::HashMap;
-use http::Uri;
+use http::{Uri, response};
 use tiny_http::{Header, Response as HttpResponse, Server};
 use std::net::TcpListener;
 
-pub struct Request {
-    url: String,
-}
-
-impl Request {
-    pub fn url(&self) -> &str {
-        &self.url
-    }
-}
-
-pub struct Response {
-    headers: HashMap<String, String>,
-}
-
-impl Response {
-    pub fn add_header<H: Into<String>, V: Into<String>>(&mut self, header: H, value: V) {
-        self.headers.insert(header.into(), value.into());
-    }
-}
-
 pub struct WebServer {
   id: String,
-  listener: TcpListener,
   server: Arc<Server>,
   thread: Option<std::thread::JoinHandle<()>>,
+  resp: Arc<(Mutex<Option<Response>>, Condvar)>
 }
 
 impl WebServer {
-  pub fn new<R: Runtime>(app: &AppHandle<R>, _options: ServerOptions) -> crate::Result<Self> {
+  pub fn new<R: Runtime>(app: &AppHandle<R>, win: &tauri::Webview<R>, options: ServerOptions) -> crate::Result<Self> {
     let asset_resolver = app.asset_resolver();
     let listener = TcpListener::bind("127.0.0.1:0")?;
+    let addr = listener.local_addr().unwrap().to_string();
     let server = Arc::new(Server::from_listener(listener.try_clone().unwrap(), None).expect("Unable to spawn server"));
     let server2 = server.clone();
+    let win2 = win.clone();
+
+    let pair = Arc::new((Mutex::new(None), Condvar::new()));
+    let pair2 = Arc::clone(&pair);
+
     let thread = std::thread::spawn(move || {
       for req in server.incoming_requests() {
-        let path = req
+        let path: String = req
           .url()
           .parse::<Uri>()
           .map(|uri| uri.path().into())
           .unwrap_or_else(|_| req.url().into());
+        let path2: String = path.clone();
 
-        #[allow(unused_mut)]
-        if let Some(mut asset) = asset_resolver.get(path) {
-          let _request = Request {
-            url: req.url().into(),
-          };
-          let mut response = Response {
-            headers: Default::default(),
-          };
+        let request = Request {
+          url: req.url().into(),
+          path: path.clone(),
+        };
 
-          response.add_header("Content-Type", asset.mime_type);
-          if let Some(csp) = asset.csp_header {
-            response
-              .headers
-              .insert("Content-Security-Policy".into(), csp);
+        let mut response = Response {
+          headers: Default::default(),
+          body_data: None,
+          body_text: None,
+        };
+
+        println!("[web-server {}] request {} (include assets: {})", addr, req.url(), options.serve_assets);
+
+        if options.serve_assets {
+          for asset in asset_resolver.iter() {
+            println!("asset {}", asset.0)
           }
 
-          //if let Some(on_request) = &on_request {
-          //  on_request(&request, &mut response);
-          //}
+          #[allow(unused_mut)]
+          if let Some(mut asset) = asset_resolver.get(path) {
+            println!("[web-server {}] asset found at {}", addr, path2);
 
-          let mut resp = HttpResponse::from_data(asset.bytes);
+            response.add_header("Content-Type", asset.mime_type);
+            if let Some(csp) = asset.csp_header {
+              response
+                .headers
+                .insert("Content-Security-Policy".into(), csp);
+            }
+
+            response.body_data = Some(asset.bytes);
+          }
+        }
+
+        let handler = options.handler.clone().unwrap_or("".to_string());
+        if handler != "" {
+          let id:  String = serde_json::to_string(&addr).unwrap();
+          let req: String = serde_json::to_string(&request).unwrap();
+          let res: String = serde_json::to_string(&response).unwrap();
+          let js = format!("window['_{}']([{}, {}, {}])",
+            handler,
+            id, req, res);
+          println!("[web-server {}] notify request {}", addr, js);
+          win2.eval(&js);
+          // app.get_webview_window().eval(&js);
+
+          // Wait for response from javascript
+          println!("[web-server {}] wait for response", addr);
+          let (lock, cvar) = &*pair;
+          let _guard = cvar.wait_while(lock.lock().unwrap(), |pending| {
+            if let Some(res) = pending.take() {
+              response = res;
+              println!("[web-server {}] got response", addr);
+              // println!("[web-server {}] got response {}", addr, serde_json::to_string(&response).unwrap());
+              false
+            } else {
+              true
+            }
+          }).unwrap();
+        }
+
+        if let Some(body_data) = response.body_data {
+          let mut resp = HttpResponse::from_data(body_data);
+          for (header, value) in response.headers {
+            if let Ok(h) = Header::from_bytes(header.as_bytes(), value) {
+              resp.add_header(h);
+            }
+          }
+          req.respond(resp).expect("unable to setup response");
+        } else {
+          let mut resp = match response.body_text {
+            Some(body_text) => HttpResponse::from_string(body_text),
+            None => HttpResponse::from_string(""),
+          };
           for (header, value) in response.headers {
             if let Ok(h) = Header::from_bytes(header.as_bytes(), value) {
               resp.add_header(h);
@@ -118,22 +170,29 @@ impl WebServer {
           }
           req.respond(resp).expect("unable to setup response");
         }
+
       }
     });
+    println!("[web-server] start on {}", listener.local_addr().unwrap());
     Ok(WebServer{
       id: listener.local_addr().unwrap().to_string(),
-      listener,
       server: server2,
       thread: Some(thread),
+      resp: pair2,
     })
   }
 
-  pub fn address(web_server: &Self) -> crate::Result<String> {
-    let addr = web_server.listener.local_addr().unwrap();
-    Ok(addr.to_string())
+  pub fn respond(&self, res: Response) -> crate::Result<()> {
+    // println!("[web-server {}] front responded {}", self.id, serde_json::to_string(&res).unwrap());
+    let (lock, cvar) = &*self.resp;
+    let mut response = lock.lock().unwrap();
+    *response = Some(res);
+    cvar.notify_one();
+    Ok(())
   }
 
   pub fn close(mut self) -> crate::Result<()> {
+    println!("[web-server] stop on {}", self.id);
     self.server.unblock();
     if let Some(thread) = self.thread.take() {
       let _ = thread.join();
