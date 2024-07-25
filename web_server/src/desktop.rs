@@ -131,7 +131,7 @@ impl WebServer {
           let js = format!("window['_{}']([{}, {}, {}])",
             handler,
             id, req, res);
-          println!("[web-server {}] notify request {}", addr, js);
+          // println!("[web-server {}] notify request {}", addr, js);
           win2.eval(&js);
           // app.get_webview_window().eval(&js);
 

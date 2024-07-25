@@ -9,7 +9,7 @@ exclude = ["/examples", "/webview-dist", "/webview-src", "/node_modules"]
 links = "tauri-plugin-web-server"
 
 [dependencies]
-tauri = { version = "2.0.0-beta.23" }
+tauri = { version = "2.0.0-beta.23", features = ["devtools"] }
 serde = "1.0"
 thiserror = "1.0"
 # actix-web = "4"

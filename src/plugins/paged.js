@@ -107,13 +107,28 @@ class Paged {
       style.setAttribute('media', 'screen')
       style.setAttribute('href', '/paged_interface.css')
 
+      const importmap = iframe.contentDocument.createElement('script')
+      importmap.setAttribute('type', 'importmap')
+      importmap.textContent = JSON.stringify({
+        imports: {
+          'pagedjs': '/pagedjs.js',
+        }
+      })
+
+      const script = iframe.contentDocument.createElement('script')
+      script.setAttribute('src', '/pagedjs-polyfill.js')
+
       iframe.contentDocument.head.insertBefore(style, iframe.contentDocument.head.firstChild)
+      iframe.contentDocument.head.insertBefore(script, iframe.contentDocument.head.firstChild)
+      iframe.contentDocument.head.insertBefore(importmap, iframe.contentDocument.head.firstChild)
 
       res.body_data = null
       res.body_text = editor.value
       res.headers['Content-Type'] = 'text/html; charset=utf-8'
 
       style.remove()
+      script.remove()
+      importmap.remove()
     }
     respondServer(id, res)
     console.log("[%o] http handler responded", id, res)

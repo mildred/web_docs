@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && : npm run prepare_pagedjs && : npm run copy_node",
+    "build": "tsc && vite build && ROLLUP_STEP=pagedjs-polyfill vite build ",
     "preview": "vite preview",
     "tauri": "tauri",
     "copy_node": "node copy_node.js",

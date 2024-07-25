@@ -1,4 +1,5 @@
 import { defineConfig, transformWithEsbuild } from 'vite'
+import { resolve } from 'path'
 import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
@@ -30,11 +31,40 @@ export default defineConfig(async () => ({
   },
 
   build: {
+    emptyOutDir: !process.env.ROLLUP_STEP,
     target: 'esnext',
     cssCodeSplit: false,
     sourcemap: true,
-    rollupOptions: {},
     minify: false,
+    rollupOptions: process.env.ROLLUP_STEP == 'pagedjs-polyfill' ? {
+      input: {
+        'pagedjs-polyfill': resolve(__dirname , './node_modules/pagedjs/src/polyfill/polyfill.js'),
+      },
+      output: [
+        {
+          inlineDynamicImports: false,
+          entryFileNames: '[name].js',
+          assetFileNames: 'assets/[name][extname]',
+          chunkFileNames: 'chunks/[name]-[hash].js',
+          format: 'iife',
+        }
+      ]
+    } : {
+      input: {
+        main: resolve(__dirname , './index.html'),
+        pagedjs: resolve(__dirname , './node_modules/pagedjs/src/index.js'),
+        'pagedjs-polyfill': resolve(__dirname , './node_modules/pagedjs/src/polyfill/polyfill.js'),
+      },
+      output: [
+        {
+          inlineDynamicImports: false,
+          entryFileNames: '[name].js',
+          assetFileNames: 'assets/[name][extname]',
+          chunkFileNames: 'chunks/[name]-[hash].js',
+          format: 'es',
+        }
+      ]
+    }
   },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
