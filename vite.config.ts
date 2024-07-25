@@ -40,25 +40,12 @@ export default defineConfig(async () => ({
   },
 
   build: {
-    emptyOutDir: !process.env.ROLLUP_STEP,
+    emptyOutDir: true,
     target: 'esnext',
     cssCodeSplit: false,
     sourcemap: true,
     minify: false,
-    rollupOptions: process.env.ROLLUP_STEP == 'pagedjs-polyfill' ? {
-      input: {
-        'pagedjs-polyfill': resolve(__dirname , './node_modules/pagedjs/src/polyfill/polyfill.js'),
-      },
-      output: [
-        {
-          inlineDynamicImports: false,
-          entryFileNames: '[name].js',
-          assetFileNames: 'assets/[name][extname]',
-          chunkFileNames: 'chunks/[name]-[hash].js',
-          format: 'iife',
-        }
-      ]
-    } : {
+    rollupOptions: {
       input: {
         main: resolve(__dirname , './index.html'),
         pagedjs: resolve(__dirname , './node_modules/pagedjs/src/index.js'),

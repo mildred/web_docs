@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build && ROLLUP_STEP=pagedjs-polyfill vite build ",
+    "dev": "rollup -c rollup.config.mjs && vite",
+    "build": "tsc && rollup -c rollup.config.mjs && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
     "copy_node": "node copy_node.js",
@@ -40,6 +40,7 @@
     "@tauri-apps/cli": ">=2.0.0-beta.0",
     "@vitejs/plugin-react": "^4.3.1",
     "pagedjs-cli": "^0.4.3",
+    "rollup": "^4.19.0",
     "typescript": "^5.2.2",
     "vite": "^5.3.1",
     "vite-plugin-static-copy": "^1.0.6"

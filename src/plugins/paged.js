@@ -116,7 +116,7 @@ class Paged {
       })
 
       const script = iframe.contentDocument.createElement('script')
-      script.setAttribute('src', '/pagedjs-polyfill/browser.js')
+      script.setAttribute('src', '/pagedjs-polyfill.js')
 
       iframe.contentDocument.head.insertBefore(style, iframe.contentDocument.head.firstChild)
       iframe.contentDocument.head.insertBefore(script, iframe.contentDocument.head.firstChild)
