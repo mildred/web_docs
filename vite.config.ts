@@ -1,6 +1,7 @@
 import { defineConfig, transformWithEsbuild } from 'vite'
 import { resolve } from 'path'
 import react from "@vitejs/plugin-react";
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
@@ -18,7 +19,15 @@ export default defineConfig(async () => ({
         })
       },
     },
-    react()
+    react(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'node_modules/pagedjs-cli/dist/browser.js',
+          dest: 'pagedjs-polyfill'
+        }
+      ]
+    })
   ],
 
   optimizeDeps: {
@@ -53,7 +62,6 @@ export default defineConfig(async () => ({
       input: {
         main: resolve(__dirname , './index.html'),
         pagedjs: resolve(__dirname , './node_modules/pagedjs/src/index.js'),
-        'pagedjs-polyfill': resolve(__dirname , './node_modules/pagedjs/src/polyfill/polyfill.js'),
       },
       output: [
         {
