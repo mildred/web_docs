@@ -22,19 +22,20 @@ const App = ({}) => {
   getVersion().then(setVersion)
 
   useEffect(() => {
+    getMatches().then(async (matches) => {
+      console.log("CLI arg: %o", matches)
+      if (matches.args.filename) {
+        let path = matches.args.filename.value
+        const html = await readTextFile(path)
+        if (html != null) {
+          setContent(html)
+        }
+      }
+    })
     return () => {
       // alert('Losing all your data !!!')
     }
   }, [])
-
-  getMatches().then(async (matches) => {
-    if (matches.filename) {
-      const html = await readTextFile(path)
-      if (html != null) {
-        setContent(html)
-      }
-    }
-  })
 
   const buttons = (small, xsmall) => ([
     {group: "file",       buttons: [ 'newFile', 'openFile', 'saveFile', 'printPage' ]},

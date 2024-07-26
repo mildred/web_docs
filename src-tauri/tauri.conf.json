@@ -29,9 +29,9 @@
             "cli:default",
             "dialog:default",
             "event:default",
-            "fs:default",
             "fs:allow-app-write",
             "fs:allow-temp-write",
+            "fs:default",
             "path:default",
             { "identifier": "shell:allow-execute",
               "allow": [
@@ -82,6 +82,14 @@
           "index": 1,
           "takesValue": true
         }
+      ]
+    },
+    "fs": {
+      "scope": [
+        "*/**",
+        "$HOME",
+        "$HOME/*",
+        "$HOME/**"
       ]
     },
     "shell": {
