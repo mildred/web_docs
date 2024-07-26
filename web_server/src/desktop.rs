@@ -110,7 +110,7 @@ impl WebServer {
 
           #[allow(unused_mut)]
           if let Some(mut asset) = asset_resolver.get(path) {
-            println!("[web-server {}] asset found at {}", addr, path2);
+            println!("[web-server {}] asset found at {} as {}", addr, path2, asset.mime_type);
 
             response.add_header("Content-Type", asset.mime_type);
             if let Some(csp) = asset.csp_header {
