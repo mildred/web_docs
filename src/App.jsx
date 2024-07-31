@@ -75,7 +75,8 @@ const App = ({}) => {
       sourceEditorCDNUrlsJS: [],
       beautifyHTMLCDNUrlsJS: [],
       showPlaceholder: false,
-      iframe: true,
+      // iframe: true,
+      iframe_sandbox: true,
       cleanHTML: {
         // useIframeSandbox: true
       },
