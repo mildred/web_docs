@@ -1,3 +1,4 @@
+import { invoke } from '@tauri-apps/api/core'
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import JoditEditor, { Jodit } from './JoditEditor';
 import { getVersion } from '@tauri-apps/api/app';
@@ -26,6 +27,7 @@ const App = ({}) => {
       console.log("CLI arg: %o", matches)
       if (matches.args.filename) {
         let path = matches.args.filename.value
+        await invoke("allow_file", { path })
         const html = await readTextFile(path)
         if (html != null) {
           setContent(html)
