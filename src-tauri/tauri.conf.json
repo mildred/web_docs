@@ -1,6 +1,6 @@
 {
   "productName": "WebDocs",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "identifier": "web-docs.mildred.fr",
   "build": {
     "beforeDevCommand": "npm run dev",

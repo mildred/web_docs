@@ -23,9 +23,10 @@ const App = ({}) => {
   getVersion().then(setVersion)
 
   useEffect(() => {
+    // document.querySelector('iframe.jodit-wysiwyg_iframe').setAttribute('sandbox', '')
     getMatches().then(async (matches) => {
       console.log("CLI arg: %o", matches)
-      if (matches.args.filename) {
+      if (matches.args.filename?.value) {
         let path = matches.args.filename.value
         await invoke("allow_file", { path })
         const html = await readTextFile(path)
@@ -75,6 +76,9 @@ const App = ({}) => {
       beautifyHTMLCDNUrlsJS: [],
       showPlaceholder: false,
       iframe: true,
+      cleanHTML: {
+        // useIframeSandbox: true
+      },
       // iframeCSSLinks: [ 'https://cdn.jsdelivr.net/npm/jodit-pro@4.2.24/es2021.en/jodit.fat.min.css' ],
       iframeStyle: `
         html.jodit-wysiwyg_iframe body {
