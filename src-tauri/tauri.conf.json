@@ -1,6 +1,6 @@
 {
   "productName": "WebDocs",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "identifier": "web-docs.mildred.fr",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -33,6 +33,8 @@
             "fs:allow-temp-write",
             "fs:default",
             "path:default",
+            "process:allow-exit",
+            "process:allow-restart",
             { "identifier": "shell:allow-execute",
               "allow": [
                 {
