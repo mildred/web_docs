@@ -125,35 +125,44 @@ class File {
       window.location.hash = ''
       this.forceopen(editor)
     } else {
-      this.setNoDirty(editor)
+      setTimeout(() => {
+        this.setNoDirty(editor)
+      }, 100)
     }
 
     editor.events.on('change', (e) => {
       console.log('change', e)
+      this.updateTitle(editor)
     });
+
+    //this.stop_interval_update_title = setInterval(() => {
+    //  this.updateTitle(editor)
+    //}, 1000)
   }
 
   destruct() {
     if (this.unlisten) this.unlisten.then(f => {if (f) f()})
+    if (this.stop_interval_update_title) this.stop_interval_update_title()
   }
 
   isDirty(editor) {
     const value = editor.getNativeEditorValue()
     const hash  = murmurhash(value)
-    console.log('last', this.currentHash, this.lastValue)
-    console.log('curr', hash, value)
+    //console.log('last', this.currentHash, this.lastValue)
+    //console.log('curr', hash, value)
     let dirty = hash != this.currentHash
     return dirty
   }
 
-  setNoDirty(editor, val = undefined){
-    setTimeout(() => {
-      const value = editor.getNativeEditorValue()
-      this.currentHash = murmurhash(value)
-      this.lastValue = value
-      console.log('not dirty')
-      // TODO: when the editor gains focus the first time, it triggers a change
-    }, 100)
+  setNoDirty(editor){
+    //setTimeout(() => {
+    const value = editor.getNativeEditorValue()
+    this.currentHash = murmurhash(value)
+    this.lastValue = value
+    console.log('not dirty')
+    this.updateTitle(editor)
+    // TODO: when the editor gains focus the first time, it triggers a change
+    //}, 100)
   }
 
   async new(editor, open = false) {
@@ -199,9 +208,15 @@ class File {
     const html = await readTextFile(path)
     if (html == null) return
 
-    this.setCurrentPath(path)
+    this.setCurrentPath(editor, path)
+
+    // Normalize HTML
+    //let template = document.createElement('template')
+    //template.innerHTML = html
+    //html = template.innerHTML
+
     editor.value = html
-    this.setNoDirty(editor, html)
+    this.setNoDirty(editor)
   }
 
   async save(editor) {
@@ -215,9 +230,10 @@ class File {
     }
 
     try {
-      const value = editor.value
-      writeTextFile(this.currentPath, editor.value)
-      this.setNoDirty(editor, value)
+      const value = this.getMarkupForSave(editor)
+      console.log('writeTextFile', value)
+      writeTextFile(this.currentPath, value)
+      this.setNoDirty(editor)
     } catch (e) {
       message(e.message, {
         title: 'Could not save',
@@ -239,19 +255,99 @@ class File {
         continue
       }
 
-      const value = editor.value
+      const value = this.getMarkupForSave(editor)
       writeTextFile(savePath, value)
       if (!copy) {
-        this.setCurrentPath(savePath)
-        this.setNoDirty(editor, value)
+        this.setCurrentPath(editor, savePath)
+        this.setNoDirty(editor)
       }
       break
     }
   }
 
-  setCurrentPath(path) {
+  getMarkupForSave(editor) {
+    //let old_value = editor.value
+
+    //editor.iframe.contentDocument.documentElement.classList.toggle('jodit-wysiwyg_iframe', false)
+    //editor.iframe.contentDocument.body.removeAttribute('contenteditable')
+
+    let value = editor.getNativeEditorValue()
+    //editor.value = old_value
+
+    // Cleanup HTML
+    let doc = new DOMParser().parseFromString(value, 'text/html')
+    doc.documentElement.classList.toggle('jodit-wysiwyg_iframe', false)
+    if (doc.documentElement.getAttribute('class') === '') doc.documentElement.removeAttribute('class')
+    doc.body.removeAttribute('contenteditable')
+    doc.body.removeAttribute('spellcheck')
+    doc.body.style.minHeight = null
+    if (doc.body.getAttribute('style') === '') doc.body.removeAttribute('style')
+    //let res = new XMLSerializer().serializeToString(doc);
+    let res = new XMLSerializer().serializeToString(doc.doctype) + doc.documentElement.outerHTML
+
+    //let res = this.clearMarkers(value)
+
+    console.log('getMarkupForSave()', res)
+    return res
+
+    //return value
+  }
+
+  /*
+  clearMarkers(html) {
+    const bodyReg = /<body.*<\/body>/im,
+      bodyMarker = '{%%BODY%%}',
+      body = bodyReg.exec(html);
+
+    if (body) {
+      // remove markers
+      html = html
+        .replace(bodyReg, bodyMarker)
+        .replace(/<span([^>]*?)>(.*?)<\/span>/gim, '')
+        .replace(
+          /&lt;span([^&]*?)&gt;(.*?)&lt;\/span&gt;/gim,
+          ''
+        )
+        .replace(
+          bodyMarker,
+
+          body[0]
+          .replace(
+            /(<body[^>]+?)min-height["'\s]*:[\s"']*[0-9]+(px|%)/im,
+            '$1'
+          )
+          .replace(
+            /(<body[^>]+?)([\s]*["'])?contenteditable["'\s]*=[\s"']*true["']?/im,
+            '$1'
+          )
+          .replace(
+            /<(style|script|span)[^>]+jodit[^>]+>.*?<\/\1>/g,
+            ''
+          )
+        )
+        .replace(
+          /(class\s*=\s*)(['"])([^"']*)(jodit-wysiwyg|jodit)([^"']*\2)/g,
+          '$1$2$3$5'
+        )
+        .replace(/(<[^<]+?)\sclass="[\s]*"/gim, '$1')
+        .replace(/(<[^<]+?)\sstyle="[\s;]*"/gim, '$1')
+        .replace(/(<[^<]+?)\sdir="[\s]*"/gim, '$1');
+    }
+
+    return html;
+  }
+  */
+
+  setCurrentPath(editor, path) {
     this.currentPath = path
-    getCurrentWindow().setTitle(`${path.match(/[^\/]*$/)[0]} - WebDocs - ${path.match(/^(.*)\/[^\/]*$/)[1]}`)
+    this.updateTitle(editor)
+  }
+
+  updateTitle(editor) {
+    let dirty = this.isDirty(editor)
+    let fname = this.currentPath ? this.currentPath.match(/[^\/]*$/)[0] : 'untitled.html'
+    let directory = this.currentPath ? this.currentPath.match(/^(.*)\/[^\/]*$/)[1] : null
+    getCurrentWindow().setTitle(`${fname}${dirty ? '*' : ''} - WebDocs${directory ? ' - ' + directory : ''}`)
   }
 }
 
